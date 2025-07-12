@@ -79,16 +79,15 @@ def generate_training_plan(user_profile, history=None):
         total_time = 10
 
     plan.append({"name": "Разминка",
-                 "text": f"Разминка - {total_time} минут"
+                 "text": f"1. Разминка - {total_time} минут"
                  })
 
     cardio_time_target = time * cardio_ratio
     strength_time_target = time * strength_ratio
-    coun = 1
 
     def add_exercises(ex_list, time_target):
-        nonlocal total_time, plan, coun
-        for ex in ex_list:
+        nonlocal total_time, plan
+        for coun, ex in  enumerate(ex_list, 1):
             ex_time = ex["duration_min"] * sets + (sets -1) * (rest / 60)
             if total_time + ex_time > time:
                 break
@@ -99,7 +98,6 @@ def generate_training_plan(user_profile, history=None):
                              "rest_sec": rest,
                              "text": f"{coun}. {ex['name'].capitalize()} — {sets} подхода по {reps} повторений (отдых: {rest} сек)"
                 })
-                coun += 1
                 total_time += ex_time
                 time_target -= ex_time
 
@@ -107,7 +105,7 @@ def generate_training_plan(user_profile, history=None):
     add_exercises(strength_exercises, strength_time_target)
 
     adapted_plan = []
-    for exercise in plan:
+    for coun, exercise in enumerate(plan, 1):
         if exercise["name"] != "Разминка":
             times_done = history.count(exercise["name"]) if history else 0
             exercise_copy = exercise.copy()
